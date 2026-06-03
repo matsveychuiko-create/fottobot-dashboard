@@ -970,41 +970,48 @@
   }
 
   /* ─── SIDEBAR TOGGLE ─── */
+  .sidebar {
+    transition: width 0.3s ease, min-width 0.3s ease;
+    position: relative;
+    overflow: visible;
+  }
+
+  .sidebar.collapsed {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
   .sidebar-toggle {
-    position: absolute;
-    top: 16px;
-    right: -14px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 220px;
+    width: 20px;
+    height: 52px;
+    border-radius: 0 8px 8px 0;
     background: var(--accent);
-    border: 2px solid var(--topbar-bg);
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10;
-    transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(123,97,255,0.4);
+    z-index: 200;
+    transition: left 0.3s ease, background 0.2s;
+    box-shadow: 3px 0 10px rgba(123,97,255,0.35);
     color: #fff;
   }
 
-  .sidebar-toggle:hover {
-    background: var(--accent2);
-    box-shadow: 0 3px 12px rgba(123,97,255,0.5);
-    transform: scale(1.1);
-  }
+  .sidebar-toggle:hover { background: var(--accent2); }
 
-  .sidebar-toggle svg {
-    transition: transform 0.3s;
-    flex-shrink: 0;
-  }
+  .sidebar-toggle svg { transition: transform 0.3s; flex-shrink: 0; }
 
   /* Tooltip */
   .sidebar-toggle::after {
-    content: 'Свернуть меню';
+    content: attr(data-tooltip);
     position: absolute;
-    left: 38px;
+    left: 28px;
     top: 50%;
     transform: translateY(-50%);
     background: var(--text);
@@ -1018,65 +1025,10 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
 
-  .sidebar-toggle::before {
-    content: '';
-    position: absolute;
-    left: 34px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 5px solid transparent;
-    border-right-color: var(--text);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-
-  .sidebar-toggle:hover::after,
-  .sidebar-toggle:hover::before { opacity: 1; }
-
-  /* Collapsed state */
-  .sidebar.collapsed {
-    width: 52px;
-  }
-
-  .sidebar.collapsed .sidebar-toggle::after { content: 'Развернуть меню'; }
-
-  .sidebar.collapsed .sidebar-toggle svg {
-    transform: rotate(180deg);
-  }
-
-  .sidebar.collapsed .sidebar-item span:not(.sidebar-badge),
-  .sidebar.collapsed .sidebar-item .s-icon + *,
-  .sidebar.collapsed .disk-widget .disk-label,
-  .sidebar.collapsed .disk-widget .disk-value,
-  .sidebar.collapsed .disk-warning,
-  .sidebar.collapsed .sidebar-badge {
-    display: none;
-  }
-
-  .sidebar.collapsed .sidebar-item {
-    justify-content: center;
-    padding: 10px;
-  }
-
-  .sidebar.collapsed .disk-widget {
-    padding: 8px;
-  }
-
-  .sidebar.collapsed .s-icon {
-    width: 18px;
-    height: 18px;
-    color: rgba(160,168,192,0.8);
-  }
-
-  .sidebar.collapsed .sidebar-item.active .s-icon { color: var(--accent2); }
-
-  .layout { transition: none; }
-
-  .sidebar { transition: width 0.3s ease; position: relative; }
+  .sidebar-toggle:hover::after { opacity: 1; }
 
   .stats-row { animation: fadeUp 0.3s ease; }
   .filters-card { animation: fadeUp 0.35s ease 0.05s both; }
@@ -1117,9 +1069,6 @@
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-  <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle-btn">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
   <nav class="sidebar-nav">
     <a href="#" class="sidebar-item active">
       <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -1186,6 +1135,10 @@
     </a>
   </div>
 </aside>
+
+<button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" data-tooltip="Свернуть меню">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="toggle-arrow"><polyline points="15 18 9 12 15 6"/></svg>
+</button>
 
 <!-- MAIN -->
 <main class="main">
@@ -1477,7 +1430,19 @@
 <script>
   function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('collapsed');
+    const btn = document.getElementById('sidebar-toggle-btn');
+    const arrow = document.getElementById('toggle-arrow');
+    const collapsed = sidebar.classList.toggle('collapsed');
+
+    if (collapsed) {
+      btn.style.left = '0px';
+      btn.setAttribute('data-tooltip', 'Развернуть меню');
+      arrow.style.transform = 'rotate(180deg)';
+    } else {
+      btn.style.left = '220px';
+      btn.setAttribute('data-tooltip', 'Свернуть меню');
+      arrow.style.transform = 'rotate(0deg)';
+    }
   }
 
   function toggleFilters() {
