@@ -1171,6 +1171,137 @@
 
   .sidebar-toggle:hover::after { opacity: 1; }
 
+
+  /* ─── COLUMNS DROPDOWN ─── */
+  .columns-dropdown {
+    position: relative;
+    flex: 1;
+  }
+
+  .columns-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: var(--text2);
+    transition: border-color 0.2s;
+    user-select: none;
+  }
+
+  .columns-trigger:hover { border-color: var(--accent); }
+  .columns-trigger svg { transition: transform 0.2s; flex-shrink: 0; }
+  .columns-trigger.open svg { transform: rotate(180deg); }
+
+  .columns-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    z-index: 50;
+    display: none;
+    padding: 8px 0;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .columns-menu.open { display: block; }
+
+  .col-item {
+    padding: 0;
+  }
+
+  .col-item label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: var(--text2);
+    transition: background 0.15s;
+  }
+
+  .col-item label:hover { background: var(--surface2); }
+
+  .col-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .col-hidden { display: none !important; }
+
+  /* ─── AI AGENT BUTTON ─── */
+  @keyframes pulse-ai {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(123,97,255,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(123,97,255,0); }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .sidebar-item.ai-agent {
+    background: linear-gradient(135deg, rgba(123,97,255,0.25), rgba(109,40,217,0.15));
+    border: 1.5px solid rgba(123,97,255,0.4);
+    color: #fff;
+    margin-bottom: 6px;
+    position: relative;
+    animation: pulse-ai 2.5s infinite;
+  }
+
+  .sidebar-item.ai-agent:hover {
+    background: linear-gradient(135deg, rgba(123,97,255,0.4), rgba(109,40,217,0.3));
+    border-color: var(--accent);
+  }
+
+  .sidebar-item.ai-agent .s-icon { color: var(--accent2); opacity: 1; }
+
+  .ai-pulse {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: blink 1.5s infinite;
+    box-shadow: 0 0 6px rgba(74,222,128,0.6);
+  }
+
+  .ai-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ai-live {
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .sidebar-item.ai-agent .ai-live {
+    background: rgba(123,97,255,0.6);
+    border: 1px solid rgba(123,97,255,0.4);
+  }
+
   .stats-row { animation: fadeUp 0.3s ease; }
   .filters-card { animation: fadeUp 0.35s ease 0.05s both; }
   .table-card { animation: fadeUp 0.4s ease 0.1s both; }
@@ -1266,6 +1397,11 @@
       <div class="disk-track"><div class="disk-fill" style="width:100%;"></div></div>
       <div class="disk-warning">⚠ Диск заполнен</div>
     </div>
+    <a href="#" class="sidebar-item ai-agent">
+      <div class="ai-pulse"></div>
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 012 2v1a7 7 0 010 14v1a2 2 0 01-4 0v-1a7 7 0 010-14V4a2 2 0 012-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span class="ai-text">Помощь <span class="ai-live">24/7</span></span>
+    </a>
     <a href="#" class="sidebar-item instr">
       <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
       Инструкция
@@ -1443,9 +1579,25 @@
   <div class="table-card">
     <div class="table-toolbar">
       <span class="columns-label">Колонки</span>
-      <select class="columns-select">
-        <option>Фотограф, Год выпуска, Город, Школа/Дет. сад, Класс/Группа, Статус, Срочность, Рендеринг, Подготовка скачивания, Размер</option>
-      </select>
+      <div class="columns-dropdown" id="columns-dropdown">
+        <div class="columns-trigger" onclick="toggleColumnsDropdown()">
+          <span id="columns-summary">Все колонки выбраны</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="columns-arrow"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="columns-menu" id="columns-menu">
+          <div class="col-item"><label><input type="checkbox" data-col="col-photographer" checked> Фотограф</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-year" checked> Год выпуска</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-city" checked> Город</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-school" checked> Школа/Дет. сад</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-class" checked> Класс/Группа</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-status" checked> Статус</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-urgency" checked> Срочность</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-render" checked> Рендеринг</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-print" checked> Подготовка скачивания</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-size" checked> Размер</label></div>
+          <div class="col-item"><label><input type="checkbox" data-col="col-date" checked> Создан</label></div>
+        </div>
+      </div>
     </div>
 
     <div class="table-wrap">
@@ -1453,17 +1605,17 @@
         <thead>
           <tr>
             <th class="sorted asc" onclick="sortTable(this)">ID <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
-            <th onclick="sortTable(this)">Фотограф <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
-            <th onclick="sortTable(this)">Год <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
-            <th>Город</th>
-            <th>Школа / Дет. сад</th>
-            <th>Класс</th>
-            <th onclick="sortTable(this)">Статус <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
-            <th>Срочность</th>
-            <th>Рендеринг</th>
-            <th>Подготовка скачивания</th>
-            <th onclick="sortTable(this)">Размер <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
-            <th onclick="sortTable(this)">Создан <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th class="col-photographer" onclick="sortTable(this)">Фотограф <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th class="col-year" onclick="sortTable(this)">Год <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th class="col-city">Город</th>
+            <th class="col-school">Школа / Дет. сад</th>
+            <th class="col-class">Класс</th>
+            <th class="col-status" onclick="sortTable(this)">Статус <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th class="col-urgency">Срочность</th>
+            <th class="col-render">Рендеринг</th>
+            <th class="col-print">Подготовка скачивания</th>
+            <th class="col-size" onclick="sortTable(this)">Размер <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th class="col-date" onclick="sortTable(this)">Создан <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
             <th>Действия</th>
           </tr>
         </thead>
@@ -1662,6 +1814,72 @@
   }
 
   checkBalance();
+
+
+  // Auto-assign col classes to td by column position
+  (function() {
+    const colMap = {
+      1: 'col-photographer', 2: 'col-year', 3: 'col-city',
+      4: 'col-school', 5: 'col-class', 6: 'col-status',
+      7: 'col-urgency', 8: 'col-render', 9: 'col-print',
+      10: 'col-size', 11: 'col-date'
+    };
+    // Add classes to th
+    document.querySelectorAll('thead tr th').forEach((th, idx) => {
+      if (colMap[idx]) th.classList.add(colMap[idx]);
+    });
+    // Add classes to all td by position
+    document.querySelectorAll('tbody tr').forEach(row => {
+      row.querySelectorAll('td').forEach((td, idx) => {
+        if (colMap[idx]) td.classList.add(colMap[idx]);
+      });
+    });
+  })();
+
+  // ─── COLUMNS TOGGLE ───
+  function toggleColumnsDropdown() {
+    const menu = document.getElementById('columns-menu');
+    const trigger = document.querySelector('.columns-trigger');
+    menu.classList.toggle('open');
+    trigger.classList.toggle('open');
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('columns-dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+      document.getElementById('columns-menu').classList.remove('open');
+      document.querySelector('.columns-trigger').classList.remove('open');
+    }
+  });
+
+  // Handle checkbox changes
+  document.querySelectorAll('.columns-menu input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const col = this.dataset.col;
+      const hidden = !this.checked;
+      document.querySelectorAll('.' + col).forEach(el => {
+        el.classList.toggle('col-hidden', hidden);
+      });
+      updateColumnsSummary();
+    });
+  });
+
+  function updateColumnsSummary() {
+    const checkboxes = document.querySelectorAll('.columns-menu input[type="checkbox"]');
+    const total = checkboxes.length;
+    const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const summary = document.getElementById('columns-summary');
+    if (checked === total) {
+      summary.textContent = 'Все колонки выбраны';
+    } else {
+      const names = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.parentElement.textContent.trim())
+        .join(', ');
+      summary.textContent = names || 'Нет выбранных колонок';
+    }
+  }
 
   function toggleFilters() {
     const body = document.getElementById('filters-body');
