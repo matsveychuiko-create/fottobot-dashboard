@@ -159,7 +159,21 @@
   .layout {
     display: flex;
     flex: 1;
-    min-height: 0;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* Sidebar background extends full height */
+  .layout::before {
+    content: '';
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    z-index: 0;
+    transition: width 0.3s ease;
+    pointer-events: none;
   }
 
   /* ─── SIDEBAR ─── */
@@ -174,7 +188,10 @@
     top: 56px;
     height: calc(100vh - 56px);
     overflow-y: auto;
+    overflow-x: hidden;
     border-right: 1px solid rgba(255,255,255,0.04);
+    transition: width 0.3s ease;
+    align-self: flex-start;
   }
 
   .sidebar-nav {
