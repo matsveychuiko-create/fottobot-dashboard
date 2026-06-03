@@ -87,6 +87,7 @@
     display: flex;
     gap: 2px;
     flex: 1;
+    justify-content: center;
   }
 
   .topbar-nav a {
@@ -160,38 +161,30 @@
     display: flex;
     flex: 1;
     min-height: calc(100vh - 56px);
-  }
-
-  /* Sidebar background extends full height */
-  .layout::before {
-    content: '';
-    position: fixed;
-    top: 56px;
-    left: 0;
-    width: 220px;
-    height: 100vh;
-    background: var(--sidebar-bg);
-    z-index: 0;
-    transition: width 0.3s ease;
-    pointer-events: none;
+    align-items: stretch;
   }
 
   /* ─── SIDEBAR ─── */
   .sidebar {
     width: 220px;
+    min-width: 220px;
     background: var(--sidebar-bg);
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    padding: 12px 0;
+    padding: 0;
     position: sticky;
     top: 56px;
     height: calc(100vh - 56px);
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     border-right: 1px solid rgba(255,255,255,0.04);
-    transition: width 0.3s ease;
-    align-self: flex-start;
+    transition: width 0.3s ease, min-width 0.3s ease;
+  }
+
+  .sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden;
   }
 
   .sidebar-nav {
@@ -199,7 +192,10 @@
     display: flex;
     flex-direction: column;
     gap: 1px;
-    padding: 0 8px;
+    padding: 8px 8px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
   }
 
   .sidebar-item {
@@ -259,10 +255,11 @@
   }
 
   .sidebar-bottom {
-    padding: 0 8px;
+    padding: 0 8px 8px;
     display: flex;
     flex-direction: column;
     gap: 1px;
+    flex-shrink: 0;
   }
 
   .disk-widget {
@@ -330,7 +327,7 @@
   /* ─── MAIN ─── */
   .main {
     flex: 1;
-    padding: 20px 24px;
+    padding: 16px 24px 24px;
     overflow: auto;
     min-width: 0;
     background:
@@ -737,7 +734,7 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 980px;
+    min-width: 800px;
   }
 
   thead tr {
@@ -746,7 +743,7 @@
   }
 
   th {
-    padding: 11px 14px;
+    padding: 10px 12px;
     text-align: left;
     font-size: 0.65rem;
     font-weight: 700;
@@ -791,10 +788,17 @@
   tbody tr:hover { background: linear-gradient(to right, #FAFBFF, #F8F9FF); }
 
   td {
-    padding: 13px 14px;
-    font-size: 0.82rem;
+    padding: 10px 12px;
+    font-size: 0.8rem;
     color: var(--text2);
+    white-space: normal;
+    word-break: break-word;
+    max-width: 160px;
+  }
+
+  td.nowrap {
     white-space: nowrap;
+    max-width: none;
   }
 
   td.id-cell {
@@ -987,23 +991,9 @@
   }
 
   /* ─── SIDEBAR TOGGLE ─── */
-  .sidebar {
-    transition: width 0.3s ease, min-width 0.3s ease;
-    position: relative;
-    overflow: visible;
-  }
-
-  .sidebar.collapsed {
-    width: 0;
-    min-width: 0;
-    padding: 0;
-    overflow: hidden;
-  }
-
   .sidebar-toggle {
     position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
+    top: calc(56px + 106px);
     left: 220px;
     width: 20px;
     height: 52px;
@@ -1014,17 +1004,15 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 200;
+    z-index: 300;
     transition: left 0.3s ease, background 0.2s;
     box-shadow: 3px 0 10px rgba(123,97,255,0.35);
     color: #fff;
   }
 
   .sidebar-toggle:hover { background: var(--accent2); }
-
   .sidebar-toggle svg { transition: transform 0.3s; flex-shrink: 0; }
 
-  /* Tooltip */
   .sidebar-toggle::after {
     content: attr(data-tooltip);
     position: absolute;
@@ -1330,8 +1318,8 @@
         </thead>
         <tbody>
           <tr class="row-new">
-            <td class="id-cell">#3395</td>
-            <td class="name-cell"><a href="#">Matthew Whilson</a></td>
+            <td class="id-cell nowrap">#3395</td>
+            <td class="name-cell nowrap"><a href="#">Matthew Whilson</a></td>
             <td><span style="font-weight:600;color:var(--text);">2026</span></td>
             <td>г. Нижний Новгород</td>
             <td>Школа №1999</td>
@@ -1358,8 +1346,8 @@
           </tr>
           <!-- Примеры других статусов для демонстрации -->
           <tr class="row-shooting">
-            <td class="id-cell">#3394</td>
-            <td class="name-cell"><a href="#">Анна Петрова</a></td>
+            <td class="id-cell nowrap">#3394</td>
+            <td class="name-cell nowrap"><a href="#">Анна Петрова</a></td>
             <td><span style="font-weight:600;color:var(--text);">2026</span></td>
             <td>Москва</td>
             <td>Гимназия №5</td>
@@ -1379,8 +1367,8 @@
             </td>
           </tr>
           <tr class="row-approval">
-            <td class="id-cell">#3390</td>
-            <td class="name-cell"><a href="#">Сергей Иванов</a></td>
+            <td class="id-cell nowrap">#3390</td>
+            <td class="name-cell nowrap"><a href="#">Сергей Иванов</a></td>
             <td><span style="font-weight:600;color:var(--text);">2025</span></td>
             <td>Санкт-Петербург</td>
             <td>Школа №212</td>
@@ -1400,8 +1388,8 @@
             </td>
           </tr>
           <tr class="row-fix">
-            <td class="id-cell">#3388</td>
-            <td class="name-cell"><a href="#">Мария Козлова</a></td>
+            <td class="id-cell nowrap">#3388</td>
+            <td class="name-cell nowrap"><a href="#">Мария Козлова</a></td>
             <td><span style="font-weight:600;color:var(--text);">2025</span></td>
             <td>Казань</td>
             <td>Лицей №145</td>
