@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Заказы — Фотобот</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F0F2F8;
+    --surface: #FFFFFF;
+    --surface2: #F7F8FC;
+    --border: #E2E6F0;
+    --border2: #C8CEDE;
+    --accent: #7B61FF;
+    --accent2: #9f8fff;
+    --accent-glow: rgba(123,97,255,0.15);
+    --accent-light: #EDE9FF;
+    --text: #111827;
+    --text2: #374151;
+    --muted: #6B7280;
+    --muted2: #9CA3AF;
+    --green: #059669;
+    --green-light: #D1FAE5;
+    --green-mid: #6EE7B7;
+    --red: #DC2626;
+    --red-light: #FEE2E2;
+    --orange: #D97706;
+    --orange-light: #FEF3C7;
+    --blue: #2563EB;
+    --blue-light: #DBEAFE;
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --pink: #DB2777;
+    --pink-light: #FCE7F3;
+    --teal: #0D9488;
+    --teal-light: #CCFBF1;
+    --sidebar-bg: #1A1D2E;
+    --sidebar-text: #A0A8C0;
+    --topbar-bg: #13152A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    background: var(--topbar-bg);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(123,97,255,0.2);
+  }
+
+  .topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .topbar-logo-text {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.08em;
+  }
+
+  .topbar-nav {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .topbar-nav a {
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .topbar-nav a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .balance-chip {
+    background: linear-gradient(135deg, rgba(123,97,255,0.3), rgba(109,40,217,0.2));
+    border: 1.5px solid rgba(123,97,255,0.6);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #E9D5FF;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 0 12px rgba(123,97,255,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .balance-chip::before {
+    content: '₽';
+    font-size: 0.7rem;
+    opacity: 0.8;
+  }
+
+  .balance-chip:hover {
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(123,97,255,0.45);
+    transform: translateY(-1px);
+  }
+
+  .lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.72rem;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.2s;
+  }
+
+  .lang-btn:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+
+  /* ─── LAYOUT ─── */
+  .layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: 220px;
+    background: var(--sidebar-bg);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 0;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    border-right: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0 8px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+  }
+
+  .sidebar-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+  }
+
+  .sidebar-item.active {
+    background: linear-gradient(135deg, rgba(123,97,255,0.2), rgba(123,97,255,0.08));
+    color: #fff;
+    border: 1px solid rgba(123,97,255,0.25);
+  }
+
+  .sidebar-item.active .s-icon { color: var(--accent2); }
+
+  .s-icon {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    color: rgba(160,168,192,0.6);
+    transition: color 0.2s;
+  }
+
+  .sidebar-item:hover .s-icon { color: rgba(255,255,255,0.8); }
+
+  .sidebar-badge {
+    margin-left: auto;
+    background: var(--red);
+    color: #fff;
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 0.6rem;
+    font-weight: 700;
+  }
+
+  .s-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+    margin: 8px 8px;
+  }
+
+  .sidebar-bottom {
+    padding: 0 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .disk-widget {
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    margin: 4px 0;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .disk-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .disk-label {
+    font-size: 0.62rem;
+    color: var(--sidebar-text);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .disk-value {
+    font-size: 0.62rem;
+    color: #F59E0B;
+    font-weight: 700;
+  }
+
+  .disk-track {
+    height: 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .disk-fill {
+    height: 100%;
+    width: 97%;
+    background: linear-gradient(90deg, #7B61FF, #F59E0B);
+    border-radius: 3px;
+  }
+
+  .disk-warning {
+    font-size: 0.6rem;
+    color: #F59E0B;
+    margin-top: 5px;
+    opacity: 0.8;
+  }
+
+  .sidebar-item.instr {
+    background: rgba(16,185,129,0.1);
+    color: #6EE7B7;
+    border: 1px solid rgba(16,185,129,0.15);
+    margin-bottom: 8px;
+  }
+
+  .sidebar-item.instr:hover { background: rgba(16,185,129,0.18); }
+  .sidebar-item.instr .s-icon { color: #6EE7B7; }
+
+  .sidebar-item.logout { color: rgba(255,255,255,0.25); }
+  .sidebar-item.logout:hover { color: #FCA5A5; background: rgba(239,68,68,0.08); }
+
+  /* ─── MAIN ─── */
+  .main {
+    flex: 1;
+    padding: 20px 24px;
+    overflow: auto;
+    min-width: 0;
+    background:
+      radial-gradient(ellipse at 10% 20%, rgba(123,97,255,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 10%, rgba(59,130,246,0.06) 0%, transparent 45%),
+      radial-gradient(ellipse at 60% 80%, rgba(16,185,129,0.05) 0%, transparent 40%),
+      radial-gradient(ellipse at 20% 90%, rgba(168,85,247,0.05) 0%, transparent 40%),
+      var(--bg);
+  }
+
+  /* ─── PAGE HEADER ─── */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .page-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+
+  .page-title span {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 400;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0;
+    margin-left: 10px;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-create {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #7B61FF, #6D28D9);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+    box-shadow: 0 4px 14px rgba(123,97,255,0.4), 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .btn-create:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(123,97,255,0.5);
+  }
+
+  /* ─── STATS ROW ─── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .stat-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .stat-icon.purple { background: var(--purple-light); color: var(--purple); }
+  .stat-icon.green { background: var(--green-light); color: var(--green); }
+  .stat-icon.orange { background: var(--orange-light); color: var(--orange); }
+  .stat-icon.blue { background: var(--blue-light); color: var(--blue); }
+
+  .stat-info {}
+  .stat-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .stat-label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── FILTERS ─── */
+  .filters-card {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(123,97,255,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    backdrop-filter: blur(8px);
+  }
+
+  .filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .filters-header:hover { background: #FAFBFF; }
+
+  .filters-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .filter-icon-wrap {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+  }
+
+  .filters-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .filters-active-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-pill {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    border: 1px solid rgba(123,97,255,0.2);
+  }
+
+  .filters-chevron {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .filters-chevron svg { transition: transform 0.3s; }
+  .filters-chevron.open svg { transform: rotate(180deg); }
+  .filters-header:hover .filters-chevron { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+
+  .filters-body {
+    border-top: 2px solid var(--accent-light);
+    padding: 18px;
+    display: none;
+    background: linear-gradient(to bottom, #FAFBFF, var(--surface));
+  }
+
+  .filters-body.open { display: block; }
+
+  .filters-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .filter-group label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 5px;
+  }
+
+  .filter-input,
+  .filter-select {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    appearance: none;
+  }
+
+  .filter-input:focus,
+  .filter-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    background: #fff;
+  }
+
+  .filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 32px;
+    cursor: pointer;
+  }
+
+  .filters-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 4px;
+  }
+
+  .btn-reset {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-reset:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: var(--red-light);
+  }
+
+  .btn-search {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 22px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #7B61FF, #6D28D9);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 10px rgba(123,97,255,0.35);
+  }
+
+  .btn-search:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(123,97,255,0.45);
+  }
+
+  /* ─── START LINK ─── */
+  .start-link-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  .start-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 20px;
+    background: var(--accent-light);
+    border: 1px solid rgba(123,97,255,0.2);
+    transition: all 0.2s;
+  }
+
+  .start-link:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .play-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  .start-link:hover .play-icon { background: #fff; }
+  .start-link:hover .play-icon svg path { fill: var(--accent); }
+
+  /* ─── TABLE CARD ─── */
+  .table-card {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(123,97,255,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    backdrop-filter: blur(8px);
+  }
+
+  .table-toolbar {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+  }
+
+  .columns-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  .columns-select {
+    flex: 1;
+    padding: 5px 10px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    color: var(--text2);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+    transition: border-color 0.2s;
+  }
+
+  .columns-select:focus { outline: none; border-color: var(--accent); }
+
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+  }
+
+  thead tr {
+    background: linear-gradient(to right, #F8F9FE, #F3F4FD);
+    border-bottom: 2px solid #E8EAFF;
+  }
+
+  th {
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  th:hover { color: var(--accent); background: rgba(123,97,255,0.03); }
+  th.sorted { color: var(--accent); }
+
+  .sort-arrows {
+    display: inline-flex;
+    flex-direction: column;
+    margin-left: 4px;
+    vertical-align: middle;
+    gap: 1px;
+  }
+
+  .sort-up, .sort-down {
+    width: 0;
+    height: 0;
+    display: block;
+  }
+
+  .sort-up { border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 5px solid currentColor; opacity: 0.25; }
+  .sort-down { border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid currentColor; opacity: 0.25; }
+  th.sorted .sort-up, th.sorted .sort-down { opacity: 1; }
+  th.asc .sort-up { opacity: 1; }
+  th.desc .sort-down { opacity: 1; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: linear-gradient(to right, #FAFBFF, #F8F9FF); }
+
+  td {
+    padding: 13px 14px;
+    font-size: 0.82rem;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+
+  td.id-cell {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    color: var(--muted2);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  td.name-cell a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    padding: 2px 0;
+    border-bottom: 1px dashed rgba(123,97,255,0.3);
+  }
+
+  td.name-cell a:hover {
+    color: var(--purple);
+    border-bottom-color: var(--purple);
+  }
+
+  /* ─── STATUS BADGES ─── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Статусы заказа */
+  .badge-new { background: #DBEAFE; color: #1D4ED8; border-color: #BFDBFE; }
+  .badge-new .badge-dot { background: #3B82F6; }
+
+  .badge-shooting { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+  .badge-shooting .badge-dot { background: #F59E0B; }
+
+  .badge-processing { background: #F3E8FF; color: #6B21A8; border-color: #E9D5FF; }
+  .badge-processing .badge-dot { background: #A855F7; }
+
+  .badge-approval { background: #CCFBF1; color: #065F46; border-color: #99F6E4; }
+  .badge-approval .badge-dot { background: #10B981; }
+
+  .badge-fix { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+  .badge-fix .badge-dot { background: #EF4444; }
+
+  .badge-done { background: #D1FAE5; color: #065F46; border-color: #6EE7B7; }
+  .badge-done .badge-dot { background: #059669; }
+
+  .badge-refused { background: #F3F4F6; color: #6B7280; border-color: #E5E7EB; }
+  .badge-refused .badge-dot { background: #9CA3AF; }
+
+  /* ─── RENDER STATUS ─── */
+  .render-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .render-ready { background: var(--green-light); color: var(--green); border: 1px solid #6EE7B7; }
+  .render-processing { background: var(--orange-light); color: var(--orange); border: 1px solid #FCD34D; }
+  .render-none { color: var(--muted2); font-size: 0.7rem; }
+
+  /* ─── URGENCY ─── */
+  .urgency-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.62rem;
+    font-weight: 700;
+  }
+
+  .urgency-1 { background: #FEE2E2; color: #B91C1C; }
+  .urgency-3 { background: #FEF3C7; color: #92400E; }
+  .urgency-5 { background: #D1FAE5; color: #065F46; }
+
+  /* ─── ACTION BUTTONS ─── */
+  .actions-cell { display: flex; align-items: center; gap: 4px; }
+
+  .action-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    color: var(--muted2);
+  }
+
+  .action-btn:hover { transform: translateY(-1px); }
+  .action-btn.edit:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); box-shadow: 0 2px 8px rgba(123,97,255,0.2); }
+  .action-btn.basket:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-light); box-shadow: 0 2px 8px rgba(217,119,6,0.2); }
+  .action-btn.delete:hover { border-color: var(--red); color: var(--red); background: var(--red-light); box-shadow: 0 2px 8px rgba(220,38,38,0.2); }
+
+  /* ─── TABLE FOOTER ─── */
+  .table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 11px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .per-page {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .per-page select {
+    padding: 3px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text2);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .pagination-info { font-size: 0.72rem; color: var(--muted); }
+
+  .pagination-btns { display: flex; gap: 4px; }
+
+  .page-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ─── ROW COLOR CODING ─── */
+  tbody tr.row-new { border-left: 6px solid #3B82F6; }
+  tbody tr.row-shooting { border-left: 6px solid #F59E0B; }
+  tbody tr.row-processing { border-left: 6px solid #A855F7; }
+  tbody tr.row-approval { border-left: 6px solid #10B981; }
+  tbody tr.row-fix { border-left: 6px solid #EF4444; }
+  tbody tr.row-done { border-left: 6px solid #059669; }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stats-row { animation: fadeUp 0.3s ease; }
+  .filters-card { animation: fadeUp 0.35s ease 0.05s both; }
+  .table-card { animation: fadeUp 0.4s ease 0.1s both; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="#" class="topbar-logo">
+    <svg width="26" height="23" viewBox="0 0 265 233" fill="none">
+      <path d="M0 0 C0 73.26 0 146.52 0 222 C-6.2 220.62 -12.03 219.13 -18.01 217.11 C-28.91 213.46 -53.06 205.38 -96 191 C-96 138.2 -96 85.4 -96 31 C-49.69 15.5 -29.17 8.63 0 0 Z" fill="white" transform="translate(259,6)"/>
+      <path d="M0 0 C0 73.26 0 146.52 0 222 C-10.88 218.24 -22.01 212.65 -48.47 199.37 C-57.64 194.76 -64 191 -64 191 C-64 138.2 -64 85.4 -64 31 C-34.06 15.43 -17.27 6.98 0 0 Z" fill="white" transform="translate(132,6)"/>
+      <path d="M0 0 C0 73.26 0 146.52 0 222 C-14 215 -26.78 205.93 -33 191 C-39.09 168.15 -36.93 100.1 -21.74 14.45 C-6.49 0 0 0 0 0 Z" fill="white" transform="translate(37,6)"/>
+    </svg>
+    <span class="topbar-logo-text">ФОТОБОТ</span>
+  </a>
+
+  <nav class="topbar-nav">
+    <a href="#">Главная</a>
+    <a href="#">Стоимость</a>
+    <a href="#">Поддержка</a>
+    <a href="#">Аккаунт</a>
+    <a href="#">Панель управления</a>
+  </nav>
+
+  <div class="topbar-right">
+    <div class="balance-chip">2 748.41</div>
+    <div class="lang-btn">
+      🇷🇺 RU
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <nav class="sidebar-nav">
+    <a href="#" class="sidebar-item active">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Заказы
+    </a>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Мои шаблоны
+    </a>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      Библиотека
+    </a>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Альбомы со мной
+    </a>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.1 2.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Приём заказов
+    </a>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Размеры печати
+    </a>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Примеры разворотов
+    </a>
+    <div class="s-divider"></div>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Профиль
+    </a>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      Уведомления
+      <span class="sidebar-badge">2</span>
+    </a>
+    <a href="#" class="sidebar-item">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+      Корзина
+    </a>
+  </nav>
+
+  <div class="s-divider"></div>
+
+  <div class="sidebar-bottom">
+    <div class="disk-widget">
+      <div class="disk-top">
+        <span class="disk-label">Диск</span>
+        <span class="disk-value">3.1 / 3.1 GB</span>
+      </div>
+      <div class="disk-track"><div class="disk-fill"></div></div>
+      <div class="disk-warning">⚠ Диск заполнен</div>
+    </div>
+    <a href="#" class="sidebar-item instr">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      Инструкция
+    </a>
+    <a href="#" class="sidebar-item logout">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Выход
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1 class="page-title">ЗАКАЗЫ <span>1 заказ найден</span></h1>
+    <div class="header-actions">
+      <button class="btn-create">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        СОЗДАТЬ НОВЫЙ ЗАКАЗ
+      </button>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">1</div>
+        <div class="stat-label">Всего заказов</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">1</div>
+        <div class="stat-label">Готово к печати</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">0</div>
+        <div class="stat-label">В обработке</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">3.1 GB</div>
+        <div class="stat-label">Занято на диске</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-card">
+    <div class="filters-header" onclick="toggleFilters()">
+      <div class="filters-header-left">
+        <div class="filter-icon-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        </div>
+        <span class="filters-title">ФИЛЬТРЫ</span>
+      </div>
+      <div class="filters-chevron" id="filters-chevron">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+    <div class="filters-body open" id="filters-body">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>ID заказа</label>
+          <input type="text" class="filter-input" placeholder="Введите ID...">
+        </div>
+        <div class="filter-group">
+          <label>Год выпуска</label>
+          <input type="text" class="filter-input" placeholder="2025, 2026...">
+        </div>
+        <div class="filter-group">
+          <label>Страна</label>
+          <select class="filter-select">
+            <option value="">Все страны</option>
+            <option>Россия</option>
+            <option>Беларусь</option>
+            <option>Казахстан</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Город</label>
+          <input type="text" class="filter-input" placeholder="Введите город...">
+        </div>
+        <div class="filter-group">
+          <label>Школа / Дет. сад</label>
+          <input type="text" class="filter-input" placeholder="Название учреждения...">
+        </div>
+        <div class="filter-group">
+          <label>Класс / Группа</label>
+          <input type="text" class="filter-input" placeholder="11А, 9Б...">
+        </div>
+        <div class="filter-group">
+          <label>Статус</label>
+          <select class="filter-select">
+            <option value="">Все статусы</option>
+            <option>Новый</option>
+            <option>Съёмка</option>
+            <option>Обработка</option>
+            <option>Утверждение</option>
+            <option>Исправление</option>
+            <option>Завершён</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Срочность</label>
+          <select class="filter-select">
+            <option value="">Любая</option>
+            <option>1 день</option>
+            <option>3 дня</option>
+            <option>7 дней</option>
+          </select>
+        </div>
+      </div>
+      <div class="filters-actions">
+        <button class="btn-reset">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+          Сбросить параметры
+        </button>
+        <button class="btn-search">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Поиск
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- START LINK -->
+  <div class="start-link-wrap">
+    <a href="#" class="start-link">
+      <div class="play-icon">
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      С чего начать? Смотреть видеоинструкцию
+    </a>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-toolbar">
+      <span class="columns-label">Колонки</span>
+      <select class="columns-select">
+        <option>Фотограф, Год выпуска, Город, Школа/Дет. сад, Класс/Группа, Статус, Срочность, Рендеринг, Подготовка скачивания, Размер</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="sorted asc" onclick="sortTable(this)">ID <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th onclick="sortTable(this)">Фотограф <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th onclick="sortTable(this)">Год <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th>Город</th>
+            <th>Школа / Дет. сад</th>
+            <th>Класс</th>
+            <th onclick="sortTable(this)">Статус <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th>Срочность</th>
+            <th>Рендеринг</th>
+            <th>Подготовка скачивания</th>
+            <th onclick="sortTable(this)">Размер <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th onclick="sortTable(this)">Создан <span class="sort-arrows"><i class="sort-up"></i><i class="sort-down"></i></span></th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-new">
+            <td class="id-cell">#3395</td>
+            <td class="name-cell"><a href="#">Matthew Whilson</a></td>
+            <td><span style="font-weight:600;color:var(--text);">2026</span></td>
+            <td>г. Нижний Новгород</td>
+            <td>Школа №1999</td>
+            <td><span style="font-weight:600;">11А</span></td>
+            <td><span class="badge badge-new"><span class="badge-dot"></span>Новый</span></td>
+            <td><span class="urgency-badge urgency-1">⚡ 5</span></td>
+            <td><span class="render-none">—</span></td>
+            <td><span class="render-badge render-ready">✓ Готово к печати</span></td>
+            <td><span style="color:var(--muted);font-size:0.75rem;">3 134.4 МБ</span></td>
+            <td><span style="color:var(--muted);font-size:0.75rem;">29.01.2026</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="action-btn edit" title="Редактировать">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="action-btn basket" title="В корзину">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                </button>
+                <button class="action-btn delete" title="Удалить">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <!-- Примеры других статусов для демонстрации -->
+          <tr class="row-shooting">
+            <td class="id-cell">#3394</td>
+            <td class="name-cell"><a href="#">Анна Петрова</a></td>
+            <td><span style="font-weight:600;color:var(--text);">2026</span></td>
+            <td>Москва</td>
+            <td>Гимназия №5</td>
+            <td><span style="font-weight:600;">9Б</span></td>
+            <td><span class="badge badge-shooting"><span class="badge-dot"></span>Съёмка</span></td>
+            <td><span class="urgency-badge urgency-3">🔶 3</span></td>
+            <td><span class="render-none">—</span></td>
+            <td><span class="render-none">—</span></td>
+            <td><span style="color:var(--muted);font-size:0.75rem;">1 240 МБ</span></td>
+            <td><span style="color:var(--muted);font-size:0.75rem;">15.01.2026</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="action-btn edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="action-btn basket"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+                <button class="action-btn delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+              </div>
+            </td>
+          </tr>
+          <tr class="row-approval">
+            <td class="id-cell">#3390</td>
+            <td class="name-cell"><a href="#">Сергей Иванов</a></td>
+            <td><span style="font-weight:600;color:var(--text);">2025</span></td>
+            <td>Санкт-Петербург</td>
+            <td>Школа №212</td>
+            <td><span style="font-weight:600;">11В</span></td>
+            <td><span class="badge badge-approval"><span class="badge-dot"></span>Утверждение</span></td>
+            <td><span class="urgency-badge urgency-5">🟢 1</span></td>
+            <td><span class="render-badge render-ready">✓ Готово</span></td>
+            <td><span class="render-badge render-ready">✓ Готово к печати</span></td>
+            <td><span style="color:var(--muted);font-size:0.75rem;">2 890 МБ</span></td>
+            <td><span style="color:var(--muted);font-size:0.75rem;">10.01.2026</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="action-btn edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="action-btn basket"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+                <button class="action-btn delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+              </div>
+            </td>
+          </tr>
+          <tr class="row-fix">
+            <td class="id-cell">#3388</td>
+            <td class="name-cell"><a href="#">Мария Козлова</a></td>
+            <td><span style="font-weight:600;color:var(--text);">2025</span></td>
+            <td>Казань</td>
+            <td>Лицей №145</td>
+            <td><span style="font-weight:600;">10А</span></td>
+            <td><span class="badge badge-fix"><span class="badge-dot"></span>Исправление</span></td>
+            <td><span class="urgency-badge urgency-1">⚡ 5</span></td>
+            <td><span class="render-badge render-processing">⟳ Рендеринг...</span></td>
+            <td><span class="render-none">—</span></td>
+            <td><span style="color:var(--muted);font-size:0.75rem;">980 МБ</span></td>
+            <td><span style="color:var(--muted);font-size:0.75rem;">05.01.2026</span></td>
+            <td>
+              <div class="actions-cell">
+                <button class="action-btn edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="action-btn basket"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+                <button class="action-btn delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <div class="per-page">
+        Строк на странице:
+        <select><option>20</option><option>50</option><option>100</option></select>
+      </div>
+      <div class="pagination-info">1 – 4 из 4</div>
+      <div class="pagination-btns">
+        <button class="page-btn" disabled>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="page-btn" disabled>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  function toggleFilters() {
+    const body = document.getElementById('filters-body');
+    const chevron = document.getElementById('filters-chevron');
+    body.classList.toggle('open');
+    chevron.classList.toggle('open');
+  }
+
+  function sortTable(th) {
+    document.querySelectorAll('th').forEach(t => { t.classList.remove('sorted','asc','desc'); });
+    th.classList.add('sorted', 'asc');
+  }
+</script>
+</body>
+</html>
