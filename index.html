@@ -1242,6 +1242,51 @@
 
   .col-hidden { display: none !important; }
 
+  /* ─── INSTRUCTION PRIMARY ─── */
+  @keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+  }
+
+  .sidebar-item.instr-primary {
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.1));
+    border: 1.5px solid rgba(16,185,129,0.5);
+    color: #6EE7B7;
+    margin-bottom: 4px;
+    animation: pulse-green 2.5s infinite;
+    align-items: flex-start;
+    padding: 10px 12px;
+  }
+
+  .sidebar-item.instr-primary:hover {
+    background: linear-gradient(135deg, rgba(16,185,129,0.35), rgba(5,150,105,0.2));
+    border-color: #10B981;
+    color: #fff;
+  }
+
+  .sidebar-item.instr-primary .s-icon { color: #6EE7B7; opacity: 1; margin-top: 2px; }
+
+  .instr-hint {
+    font-size: 0.6rem;
+    color: rgba(110,231,183,0.7);
+    margin-top: 2px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .sidebar-item.instr-primary:hover .instr-hint { color: rgba(255,255,255,0.6); }
+
+  .ai-hint {
+    font-size: 0.6rem;
+    color: rgba(159,143,255,0.6);
+    margin-top: 2px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .sidebar-item.ai-agent { align-items: flex-start; padding: 10px 12px; }
+  .sidebar-item.ai-agent .s-icon { margin-top: 2px; }
+
   /* ─── AI AGENT BUTTON ─── */
   @keyframes pulse-ai {
     0%, 100% { box-shadow: 0 0 0 0 rgba(123,97,255,0.5); }
@@ -1389,6 +1434,22 @@
   <div class="s-divider"></div>
 
   <div class="sidebar-bottom">
+    <a href="#" class="sidebar-item instr-primary">
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <div>
+        <div>Инструкция</div>
+        <div class="instr-hint">Начните здесь 👆</div>
+      </div>
+    </a>
+    <a href="#" class="sidebar-item ai-agent">
+      <div class="ai-pulse"></div>
+      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 012 2v1a7 7 0 010 14v1a2 2 0 01-4 0v-1a7 7 0 010-14V4a2 2 0 012-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      <div>
+        <span class="ai-text">Помощь <span class="ai-live">24/7</span></span>
+        <div class="ai-hint">Если не нашли в инструкции</div>
+      </div>
+    </a>
+    <div class="s-divider" style="margin-top:8px;"></div>
     <div class="disk-widget">
       <div class="disk-top">
         <span class="disk-label">Диск</span>
@@ -1397,15 +1458,6 @@
       <div class="disk-track"><div class="disk-fill" style="width:100%;"></div></div>
       <div class="disk-warning">⚠ Диск заполнен</div>
     </div>
-    <a href="#" class="sidebar-item ai-agent">
-      <div class="ai-pulse"></div>
-      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 012 2v1a7 7 0 010 14v1a2 2 0 01-4 0v-1a7 7 0 010-14V4a2 2 0 012-2z"/><circle cx="12" cy="12" r="3"/></svg>
-      <span class="ai-text">Помощь <span class="ai-live">24/7</span></span>
-    </a>
-    <a href="#" class="sidebar-item instr">
-      <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-      Инструкция
-    </a>
     <a href="#" class="sidebar-item logout">
       <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Выход
