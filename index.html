@@ -1002,7 +1002,60 @@
     gap: 3px;
   }
 
-  .balance-chip.low {
+  .stat-card.disk-high {
+    border: 1.5px solid #FCA5A5;
+    background: linear-gradient(135deg, #FFF5F5, #FFF);
+    animation: pulse-red 2s infinite;
+  }
+
+  .stat-card.disk-high .stat-value { color: var(--red) !important; }
+
+  .stat-card.disk-high .stat-icon {
+    background: var(--red-light);
+    color: var(--red);
+  }
+
+  .disk-tooltip {
+    position: fixed;
+    background: #1A1D2E;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 10px 14px;
+    border-radius: 10px;
+    max-width: 240px;
+    line-height: 1.5;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    border: 1px solid rgba(239,68,68,0.3);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+
+  .disk-tooltip.visible { opacity: 1; }
+
+  .disk-tooltip strong {
+    color: #FCA5A5;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.75rem;
+  }
+
+  .disk-tooltip .tip-icon {
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .disk-widget.disk-high-sidebar .disk-warning { color: var(--red); }
+  .disk-widget.disk-high-sidebar .disk-fill {
+    background: linear-gradient(90deg, var(--red), #F97316);
+  }
+  .disk-widget.disk-high-sidebar {
+    border: 1px solid rgba(220,38,38,0.3);
+    background: rgba(220,38,38,0.05);
+    animation: pulse-red 2s infinite;
+  }
     background: linear-gradient(135deg, rgba(220,38,38,0.25), rgba(220,38,38,0.1));
     border-color: rgba(220,38,38,0.6);
     color: #FCA5A5;
@@ -1165,9 +1218,9 @@
     <div class="disk-widget">
       <div class="disk-top">
         <span class="disk-label">Диск</span>
-        <span class="disk-value">3.1 / 3.1 GB</span>
+        <span class="disk-value">60 / 50 GB</span>
       </div>
-      <div class="disk-track"><div class="disk-fill"></div></div>
+      <div class="disk-track"><div class="disk-fill" style="width:100%;"></div></div>
       <div class="disk-warning">⚠ Диск заполнен</div>
     </div>
     <a href="#" class="sidebar-item instr">
@@ -1180,6 +1233,11 @@
     </a>
   </div>
 </aside>
+
+<div class="disk-tooltip" id="disk-tooltip">
+  <strong>⚠ Переместите заказы в корзину!</strong>
+  За каждый МБ сверх лимита списывается <strong style="color:#FCD34D;display:inline;">1 ₽ в день</strong>. Перенесите завершённые заказы в корзину чтобы освободить место.
+</div>
 
 <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" data-tooltip="Свернуть меню">
   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="toggle-arrow"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1229,13 +1287,16 @@
         <div class="balance-warn-label" id="balance-warn" style="display:none;">⚠ Пополните баланс</div>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon blue">
+    <div class="stat-card" id="disk-card" style="position:relative;cursor:default;"
+      onmouseenter="showDiskTooltip(event)"
+      onmouseleave="hideDiskTooltip()">
+      <div class="stat-icon blue" id="disk-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </div>
       <div class="stat-info">
-        <div class="stat-value">3.1 GB</div>
+        <div class="stat-value" id="disk-value">60 <span style="font-size:0.65rem;color:var(--muted);font-weight:500;">/ 50 GB</span></div>
         <div class="stat-label">Занято на диске</div>
+        <div class="balance-warn-label" id="disk-warn" style="display:none;">⚠ Переместите в корзину</div>
       </div>
     </div>
   </div>
@@ -1490,6 +1551,48 @@
       arrow.style.transform = 'rotate(0deg)';
     }
   }
+
+  function showDiskTooltip(e) {
+    const tip = document.getElementById('disk-tooltip');
+    tip.classList.add('visible');
+    moveDiskTooltip(e);
+    document.getElementById('disk-card').addEventListener('mousemove', moveDiskTooltip);
+  }
+
+  function moveDiskTooltip(e) {
+    const tip = document.getElementById('disk-tooltip');
+    const x = e.clientX + 14;
+    const y = e.clientY - 10;
+    const maxX = window.innerWidth - 260;
+    tip.style.left = Math.min(x, maxX) + 'px';
+    tip.style.top = y + 'px';
+  }
+
+  function hideDiskTooltip() {
+    const tip = document.getElementById('disk-tooltip');
+    tip.classList.remove('visible');
+    document.getElementById('disk-card').removeEventListener('mousemove', moveDiskTooltip);
+  }
+
+  // ─── DISK WARNING ───
+  const DISK_GB = 60;
+  const DISK_LIMIT_GB = 50;
+
+  function checkDisk() {
+    const card = document.getElementById('disk-card');
+    const warn = document.getElementById('disk-warn');
+    const icon = document.getElementById('disk-icon');
+    const diskWidget = document.querySelector('.disk-widget');
+
+    if (DISK_GB >= DISK_LIMIT_GB) {
+      card.classList.add('disk-high');
+      warn.style.display = 'flex';
+      icon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+      if (diskWidget) diskWidget.classList.add('disk-high-sidebar');
+    }
+  }
+
+  checkDisk();
 
   // ─── BALANCE WARNING ───
   const BALANCE = 1700; // Сумма берётся из бэкенда
