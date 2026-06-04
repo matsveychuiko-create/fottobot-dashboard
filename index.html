@@ -156,6 +156,48 @@
 
   .lang-btn:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
 
+  .lang-dropdown { position: relative; }
+
+  .lang-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 200;
+    display: none;
+    min-width: 160px;
+    padding: 6px 0;
+    overflow: hidden;
+  }
+
+  .lang-menu.open { display: block; }
+
+  .lang-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    font-size: 0.82rem;
+    color: var(--text2);
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .lang-item:hover { background: var(--surface2); }
+
+  .lang-item.active {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  #lang-arrow { transition: transform 0.2s; }
+  .lang-btn.open #lang-arrow { transform: rotate(180deg); }
+
   /* ─── LAYOUT ─── */
   .layout {
     display: flex;
@@ -1108,12 +1150,12 @@
   .balance-chip.low:hover { border-color: var(--red); color: #fff; background: rgba(220,38,38,0.3); }
 
   /* ─── ROW COLOR CODING ─── */
-  tbody tr.row-new { border-left: 6px solid #3B82F6; }
-  tbody tr.row-shooting { border-left: 6px solid #F59E0B; }
-  tbody tr.row-processing { border-left: 6px solid #A855F7; }
-  tbody tr.row-approval { border-left: 6px solid #10B981; }
-  tbody tr.row-fix { border-left: 6px solid #EF4444; }
-  tbody tr.row-done { border-left: 6px solid #059669; }
+  tbody tr.row-new { border-left: 3px solid #3B82F6; }
+  tbody tr.row-shooting { border-left: 3px solid #F59E0B; }
+  tbody tr.row-processing { border-left: 3px solid #A855F7; }
+  tbody tr.row-approval { border-left: 3px solid #10B981; }
+  tbody tr.row-fix { border-left: 3px solid #EF4444; }
+  tbody tr.row-done { border-left: 3px solid #059669; }
 
   /* ─── SCROLLBAR ─── */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -1253,9 +1295,9 @@
     border: 1.5px solid rgba(16,185,129,0.5);
     color: #6EE7B7;
     margin-bottom: 4px;
-    animation: pulse-green 2.5s infinite;
     align-items: flex-start;
     padding: 10px 12px;
+    position: relative;
   }
 
   .sidebar-item.instr-primary:hover {
@@ -1265,6 +1307,23 @@
   }
 
   .sidebar-item.instr-primary .s-icon { color: #6EE7B7; opacity: 1; margin-top: 2px; }
+
+  .instr-badge {
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #10B981;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: blink 1.8s infinite;
+  }
 
   .instr-hint {
     font-size: 0.6rem;
@@ -1304,7 +1363,6 @@
     color: #fff;
     margin-bottom: 6px;
     position: relative;
-    animation: pulse-ai 2.5s infinite;
   }
 
   .sidebar-item.ai-agent:hover {
@@ -1375,9 +1433,26 @@
 
   <div class="topbar-right">
     <div class="balance-chip" id="balance-chip-top">1 700.00</div>
-    <div class="lang-btn">
-      🇷🇺 RU
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="lang-dropdown" id="lang-dropdown">
+      <div class="lang-btn" onclick="toggleLang()">
+        <span id="lang-flag">🇷🇺</span>
+        <span id="lang-code">RU</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="lang-arrow"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="lang-menu" id="lang-menu">
+        <div class="lang-item active" onclick="selectLang('🇷🇺','RU','Русский')">
+          <span>🇷🇺</span> Русский
+        </div>
+        <div class="lang-item" onclick="selectLang('🇬🇧','EN','English')">
+          <span>🇬🇧</span> English
+        </div>
+        <div class="lang-item" onclick="selectLang('🇵🇱','PL','Polski')">
+          <span>🇵🇱</span> Polski
+        </div>
+        <div class="lang-item" onclick="selectLang('🇺🇦','UA','Українська')">
+          <span>🇺🇦</span> Українська
+        </div>
+      </div>
     </div>
   </div>
 </header>
@@ -1435,6 +1510,7 @@
 
   <div class="sidebar-bottom">
     <a href="#" class="sidebar-item instr-primary">
+      <div class="instr-badge">!</div>
       <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
       <div>
         <div>Инструкция</div>
@@ -1889,6 +1965,30 @@
   })();
 
   // ─── COLUMNS TOGGLE ───
+  function toggleLang() {
+    const menu = document.getElementById('lang-menu');
+    const btn = document.querySelector('.lang-btn');
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+
+  function selectLang(flag, code, name) {
+    document.getElementById('lang-flag').textContent = flag;
+    document.getElementById('lang-code').textContent = code;
+    document.querySelectorAll('.lang-item').forEach(i => i.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById('lang-menu').classList.remove('open');
+    document.querySelector('.lang-btn').classList.remove('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('lang-dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+      document.getElementById('lang-menu').classList.remove('open');
+      document.querySelector('.lang-btn').classList.remove('open');
+    }
+  });
+
   function toggleColumnsDropdown() {
     const menu = document.getElementById('columns-menu');
     const trigger = document.querySelector('.columns-trigger');
