@@ -890,14 +890,14 @@
     font-family: 'Montserrat', sans-serif;
     font-size: 0.75rem;
     color: #3C4257;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.04em;
   }
 
   td.name-cell a {
     color: #312E81;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 400;
     transition: all 0.2s;
     padding: 2px 0;
     border-bottom: none;
@@ -916,7 +916,7 @@
     padding: 4px 10px;
     border-radius: 6px;
     font-size: 0.65rem;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.04em;
     white-space: nowrap;
     border: 1px solid transparent;
@@ -959,12 +959,12 @@
     padding: 4px 10px;
     border-radius: 6px;
     font-size: 0.65rem;
-    font-weight: 700;
+    font-weight: 400;
     white-space: nowrap;
   }
 
-  .render-ready { background: var(--green-light); color: var(--green); border: 1px solid #6EE7B7; }
-  .render-processing { background: var(--orange-light); color: var(--orange); border: 1px solid #FCD34D; }
+  .render-ready { background: var(--green-light); color: var(--green); border: 1px solid #6EE7B7; font-weight: 400; }
+  .render-processing { background: var(--orange-light); color: var(--orange); border: 1px solid #FCD34D; font-weight: 400; }
   .render-none { color: var(--muted2); font-size: 0.7rem; }
 
   /* ─── URGENCY ─── */
@@ -975,7 +975,7 @@
     padding: 3px 8px;
     border-radius: 5px;
     font-size: 0.62rem;
-    font-weight: 700;
+    font-weight: 400;
   }
 
   .urgency-1 { background: #FEE2E2; color: #B91C1C; }
@@ -1635,13 +1635,13 @@
         </div>
         <span class="filters-title">ФИЛЬТРЫ</span>
       </div>
-      <div class="filters-chevron open" id="filters-chevron">
+      <div class="filters-chevron" id="filters-chevron">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         <span class="chevron-text-open">Свернуть</span>
         <span class="chevron-text-close">Развернуть</span>
       </div>
     </div>
-    <div class="filters-body open" id="filters-body">
+    <div class="filters-body" id="filters-body">
       <div class="filters-grid">
         <div class="filter-group">
           <label>ID заказа</label>
@@ -1773,10 +1773,10 @@
           <tr class="row-new">
             <td class="id-cell nowrap">#3395</td>
             <td class="name-cell nowrap"><a href="#">Matthew Whilson</a></td>
-            <td><span style="font-weight:600;color:var(--text);">2026</span></td>
+            <td><span style="font-weight:400;color:var(--text);">2026</span></td>
             <td>г. Нижний Новгород</td>
             <td>Школа №1999</td>
-            <td><span style="font-weight:600;">11А</span></td>
+            <td><span style="font-weight:400;">11А</span></td>
             <td><span class="badge badge-new"><span class="badge-dot"></span>Новый</span></td>
             <td><span class="urgency-badge urgency-1">⚡ 5</span></td>
             <td><span class="render-none">—</span></td>
@@ -1801,10 +1801,10 @@
           <tr class="row-shooting">
             <td class="id-cell nowrap">#3394</td>
             <td class="name-cell nowrap"><a href="#">Анна Петрова</a></td>
-            <td><span style="font-weight:600;color:var(--text);">2026</span></td>
+            <td><span style="font-weight:400;color:var(--text);">2026</span></td>
             <td>Москва</td>
             <td>Гимназия №5</td>
-            <td><span style="font-weight:600;">9Б</span></td>
+            <td><span style="font-weight:400;">9Б</span></td>
             <td><span class="badge badge-shooting"><span class="badge-dot"></span>Съёмка</span></td>
             <td><span class="urgency-badge urgency-3">🔶 3</span></td>
             <td><span class="render-none">—</span></td>
@@ -1822,10 +1822,10 @@
           <tr class="row-approval">
             <td class="id-cell nowrap">#3390</td>
             <td class="name-cell nowrap"><a href="#">Сергей Иванов</a></td>
-            <td><span style="font-weight:600;color:var(--text);">2025</span></td>
+            <td><span style="font-weight:400;color:var(--text);">2025</span></td>
             <td>Санкт-Петербург</td>
             <td>Школа №212</td>
-            <td><span style="font-weight:600;">11В</span></td>
+            <td><span style="font-weight:400;">11В</span></td>
             <td><span class="badge badge-approval"><span class="badge-dot"></span>Утверждение</span></td>
             <td><span class="urgency-badge urgency-5">🟢 1</span></td>
             <td><span class="render-badge render-ready">✓ Готово</span></td>
@@ -1843,10 +1843,10 @@
           <tr class="row-fix">
             <td class="id-cell nowrap">#3388</td>
             <td class="name-cell nowrap"><a href="#">Мария Козлова</a></td>
-            <td><span style="font-weight:600;color:var(--text);">2025</span></td>
+            <td><span style="font-weight:400;color:var(--text);">2025</span></td>
             <td>Казань</td>
             <td>Лицей №145</td>
-            <td><span style="font-weight:600;">10А</span></td>
+            <td><span style="font-weight:400;">10А</span></td>
             <td><span class="badge badge-fix"><span class="badge-dot"></span>Исправление</span></td>
             <td><span class="urgency-badge urgency-1">⚡ 5</span></td>
             <td><span class="render-badge render-processing">⟳ Рендеринг...</span></td>
